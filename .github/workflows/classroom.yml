@@ -1,0 +1,181 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: 'Environment Setup: Install and Set OpenJDK 21 as Default'
+      id: environment-setup-install-and-set-openjdk-21-as-default
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Environment Setup: Install and Set OpenJDK 21 as Default'
+        setup-command: sudo apt update && sudo apt install openjdk-21-jdk && echo
+          "Installed OpenJDK 21"; sudo update-alternatives --set java "$(update-alternatives
+          --list java | grep java-21)"; sudo update-alternatives --set javac "$(update-alternatives
+          --list javac | grep java-21)";
+        command: javac -version && java -version;
+        timeout: 10
+    - name: 'GitHub Classroom Adaptation: Replace █ with #'
+      id: github-classroom-adaptation-replace-with
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'GitHub Classroom Adaptation: Replace █ with #'
+        setup-command: sed -i'.bak' 's/█/#/g' *.txt; sed -i'.bak' 's/█/#/g' ./edu/westmont/cs030/maze/Cell.java;
+        command: head -n 30 ./edu/westmont/cs030/maze/Cell.java;
+        timeout: 1
+    - name: 'Pre-test Check: Successful Compilation'
+      id: pre-test-check-successful-compilation
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Pre-test Check: Successful Compilation'
+        setup-command: ls -Rla | grep -E "\./edu/westmont/cs030/.*|.*.java";
+        command: javac -cp junit-platform-console-standalone-1.10.1.jar ./edu/westmont/cs030/MazeDriver.java
+          ./edu/westmont/cs030/tests/*.java ./edu/westmont/cs030/maze/*.java
+        timeout: 1
+    - name: 'Test Case 0: All Unit Tests'
+      id: test-case-0-all-unit-tests
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Test Case 0: All Unit Tests'
+        setup-command: java -jar junit-platform-console-standalone-1.10.1.jar execute
+          --classpath . --scan-class-path | grep -E "[1-9][0-9]* tests found";
+        command: java -jar junit-platform-console-standalone-1.10.1.jar execute --classpath
+          . --scan-class-path;
+        timeout: 1
+    - name: 'Test Case 1: diff Test Mode'
+      id: test-case-1-diff-test-mode
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Test Case 1: diff Test Mode'
+        setup-command: java edu.westmont.cs030.MazeDriver test > stu_out_test.txt
+          && tail -n 50 stu_out_test.txt;
+        command: diff --strip-trailing-cr --suppress-common-lines -y inst_out_test.txt
+          stu_out_test.txt && rm stu_out_test.txt;
+        timeout: 1
+    - name: 'Test Case 2: diff Linear Mode with 5 5 0 0 -1'
+      id: test-case-2-diff-linear-mode-with-5-5-0-0-1
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Test Case 2: diff Linear Mode with 5 5 0 0 -1'
+        setup-command: java edu.westmont.cs030.MazeDriver linear 5 5 0 0 -1 > stu_out_linear_5_5_0_0.txt
+          && tail -n 50 stu_out_linear_5_5_0_0.txt;
+        command: diff --strip-trailing-cr --suppress-common-lines -y inst_out_linear_5_5_0_0.txt
+          stu_out_linear_5_5_0_0.txt && rm stu_out_linear_5_5_0_0.txt;
+        timeout: 1
+    - name: 'Test Case 3: diff Linear Mode with 5 5 4 4 -1'
+      id: test-case-3-diff-linear-mode-with-5-5-4-4-1
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Test Case 3: diff Linear Mode with 5 5 4 4 -1'
+        setup-command: java edu.westmont.cs030.MazeDriver linear 5 5 4 4 -1 > stu_out_linear_5_5_4_4.txt
+          && tail -n 50 stu_out_linear_5_5_4_4.txt;
+        command: diff --strip-trailing-cr --suppress-common-lines -y inst_out_linear_5_5_4_4.txt
+          stu_out_linear_5_5_4_4.txt && rm stu_out_linear_5_5_4_4.txt;
+        timeout: 1
+    - name: 'Test Case 4: diff Linear Mode with 7 6 2 2 -1'
+      id: test-case-4-diff-linear-mode-with-7-6-2-2-1
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Test Case 4: diff Linear Mode with 7 6 2 2 -1'
+        setup-command: java edu.westmont.cs030.MazeDriver linear 7 6 2 2 -1 > stu_out_linear_7_6_2_2.txt
+          && tail -n 50 stu_out_linear_7_6_2_2.txt;
+        command: diff --strip-trailing-cr --suppress-common-lines -y inst_out_linear_7_6_2_2.txt
+          stu_out_linear_7_6_2_2.txt && rm stu_out_linear_7_6_2_2.txt;
+        timeout: 1
+    - name: 'Test Case 5: diff Linear Mode with 13 13 4 3 -1'
+      id: test-case-5-diff-linear-mode-with-13-13-4-3-1
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Test Case 5: diff Linear Mode with 13 13 4 3 -1'
+        setup-command: java edu.westmont.cs030.MazeDriver linear 13 13 4 3 -1 > stu_out_linear_13_13_4_3.txt
+          && tail -n 50 stu_out_linear_13_13_4_3.txt;
+        command: diff --strip-trailing-cr --suppress-common-lines -y inst_out_linear_13_13_4_3.txt
+          stu_out_linear_13_13_4_3.txt && rm stu_out_linear_13_13_4_3.txt;
+        timeout: 1
+    - name: 'Test Case 6: Hidden'
+      id: test-case-6-hidden
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Test Case 6: Hidden'
+        setup-command: java edu.westmont.cs030.MazeDriver linear 100 100 50 50 -1
+          > TC6_Hidden.txt && sed 's/\r$//' TC6_Hidden.txt > TC6_Hidden_NoTrailingCR.txt;
+        command: md5sum ./TC6_Hidden_NoTrailingCR.txt | grep -q "fa1453a06300d4b8c5505d70c9f3a613";
+        timeout: 1
+    - name: 'Test Case 7: Hidden'
+      id: test-case-7-hidden
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Test Case 7: Hidden'
+        setup-command: java edu.westmont.cs030.MazeDriver linear 10 100 0 2 -1 > TC7_Hidden.txt
+          && sed 's/\r$//' TC7_Hidden.txt > TC7_Hidden_NoTrailingCR.txt;
+        command: md5sum ./TC7_Hidden_NoTrailingCR.txt | grep -q "d42fa45503b84f9e84346b82946280b7";
+        timeout: 1
+    - name: 'Test Case 8: Hidden'
+      id: test-case-8-hidden
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Test Case 8: Hidden'
+        setup-command: java edu.westmont.cs030.MazeDriver linear 10 100 0 99 -1 >
+          TC8_Hidden.txt && sed 's/\r$//' TC8_Hidden.txt > TC8_Hidden_NoTrailingCR.txt;
+        command: md5sum ./TC8_Hidden_NoTrailingCR.txt | grep -q "b5a092c0d7e84822c7e929b88a4d57ee";
+        timeout: 1
+    - name: 'Test Case 9: Hidden'
+      id: test-case-9-hidden
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Test Case 9: Hidden'
+        setup-command: java edu.westmont.cs030.MazeDriver linear 1 1 0 0 -1 > TC9_Hidden.txt
+          && sed 's/\r$//' TC9_Hidden.txt > TC9_Hidden_NoTrailingCR.txt;
+        command: md5sum ./TC9_Hidden_NoTrailingCR.txt | grep -q "bff45431d33f532e72a406d5cc689c87";
+        timeout: 1
+    - name: 'Test Case 10: Hidden'
+      id: test-case-10-hidden
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: 'Test Case 10: Hidden'
+        setup-command: java edu.westmont.cs030.MazeDriver linear 1000 3 999 0 -1 >
+          TC10_Hidden.txt && sed 's/\r$//' TC10_Hidden.txt > TC10_Hidden_NoTrailingCR.txt;
+        command: md5sum ./TC10_Hidden_NoTrailingCR.txt | grep -q "60b4edc3c8a635953f495ecdbe1a8f34";
+        timeout: 1
+    - name: 'Post-test Check: All TODO Comments Removed'
+      id: post-test-check-all-todo-comments-removed
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: 'Post-test Check: All TODO Comments Removed'
+        setup-command: pwd; echo "Searching for TODOs ..."; grep -r --exclude=TODOs.grep.txt
+          --exclude-dir=".git" --exclude-dir=".github" "TODO" "$(pwd)" > TODOs.grep.txt;
+          cat ./TODOs.grep.txt;
+        command: wc -l ./TODOs.grep.txt;
+        input: ''
+        expected-output: 0 ./TODOs.grep.txt
+        comparison-method: exact
+        timeout: 1
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        ENVIRONMENT-SETUP-INSTALL-AND-SET-OPENJDK-21-AS-DEFAULT_RESULTS: "${{steps.environment-setup-install-and-set-openjdk-21-as-default.outputs.result}}"
+        GITHUB-CLASSROOM-ADAPTATION-REPLACE-WITH_RESULTS: "${{steps.github-classroom-adaptation-replace-with.outputs.result}}"
+        PRE-TEST-CHECK-SUCCESSFUL-COMPILATION_RESULTS: "${{steps.pre-test-check-successful-compilation.outputs.result}}"
+        TEST-CASE-0-ALL-UNIT-TESTS_RESULTS: "${{steps.test-case-0-all-unit-tests.outputs.result}}"
+        TEST-CASE-1-DIFF-TEST-MODE_RESULTS: "${{steps.test-case-1-diff-test-mode.outputs.result}}"
+        TEST-CASE-2-DIFF-LINEAR-MODE-WITH-5-5-0-0-1_RESULTS: "${{steps.test-case-2-diff-linear-mode-with-5-5-0-0-1.outputs.result}}"
+        TEST-CASE-3-DIFF-LINEAR-MODE-WITH-5-5-4-4-1_RESULTS: "${{steps.test-case-3-diff-linear-mode-with-5-5-4-4-1.outputs.result}}"
+        TEST-CASE-4-DIFF-LINEAR-MODE-WITH-7-6-2-2-1_RESULTS: "${{steps.test-case-4-diff-linear-mode-with-7-6-2-2-1.outputs.result}}"
+        TEST-CASE-5-DIFF-LINEAR-MODE-WITH-13-13-4-3-1_RESULTS: "${{steps.test-case-5-diff-linear-mode-with-13-13-4-3-1.outputs.result}}"
+        TEST-CASE-6-HIDDEN_RESULTS: "${{steps.test-case-6-hidden.outputs.result}}"
+        TEST-CASE-7-HIDDEN_RESULTS: "${{steps.test-case-7-hidden.outputs.result}}"
+        TEST-CASE-8-HIDDEN_RESULTS: "${{steps.test-case-8-hidden.outputs.result}}"
+        TEST-CASE-9-HIDDEN_RESULTS: "${{steps.test-case-9-hidden.outputs.result}}"
+        TEST-CASE-10-HIDDEN_RESULTS: "${{steps.test-case-10-hidden.outputs.result}}"
+        POST-TEST-CHECK-ALL-TODO-COMMENTS-REMOVED_RESULTS: "${{steps.post-test-check-all-todo-comments-removed.outputs.result}}"
+      with:
+        runners: environment-setup-install-and-set-openjdk-21-as-default,github-classroom-adaptation-replace-with,pre-test-check-successful-compilation,test-case-0-all-unit-tests,test-case-1-diff-test-mode,test-case-2-diff-linear-mode-with-5-5-0-0-1,test-case-3-diff-linear-mode-with-5-5-4-4-1,test-case-4-diff-linear-mode-with-7-6-2-2-1,test-case-5-diff-linear-mode-with-13-13-4-3-1,test-case-6-hidden,test-case-7-hidden,test-case-8-hidden,test-case-9-hidden,test-case-10-hidden,post-test-check-all-todo-comments-removed
