@@ -1,5 +1,5 @@
 /**
- * Westmont College Spring 2024
+ * Westmont College Spring 2026
  * CS 030 Project D
  *
  * @author peterpeng https://stackoverflow.com/a/24416418
