@@ -3,7 +3,7 @@
  * CS 030 Project D
  *
  * @author Assistant Professor Mike Ryu mryu@westmont.edu
- * @author Boaty McBoatface bmcboatface@westmont.edu TODO: replace this with your info.
+ * @author Lisa Kiefer lkiefer@westmont.edu
  */
 
 
@@ -64,8 +64,26 @@ public class MazeGenerator {
   }
 
   // TODO: generateMaze() -- see spec (Javadoc) for details.
+  public void generateMaze(){
+    maze.initialize();
+    generateMaze(this.maze.cells[this.r0][this.c0]);
+  }
 
   // TODO: generateMaze(Cell currCell)  -- see spec (Javadoc) for details.
+  public void generateMaze(Cell currCell){
+    currCell.setPath(true);
+    displayMaze(maze);
+    ArrayList<Cell> neighbors = maze.getNeighbors(currCell);
+    if (isShuffle) {
+      Collections.shuffle(neighbors);
+    }
+    for (Cell neighbor: neighbors){
+      if (!neighbor.isPath()) {
+        maze.connectNeighbors(currCell,neighbor);
+        generateMaze(neighbor);
+      }
+    }
+  }
 
   /**
    * Displays the given {@link Maze} at its current state to both to the GUI window and console.
