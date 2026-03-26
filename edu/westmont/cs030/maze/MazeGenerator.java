@@ -63,13 +63,11 @@ public class MazeGenerator {
     return this.renderTarget;
   }
 
-  // TODO: generateMaze() -- see spec (Javadoc) for details.
   public void generateMaze(){
     maze.initialize();
     generateMaze(this.maze.cells[this.r0][this.c0]);
   }
 
-  // TODO: generateMaze(Cell currCell)  -- see spec (Javadoc) for details.
   public void generateMaze(Cell currCell){
     currCell.setPath(true);
     displayMaze(maze);
